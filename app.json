@@ -1,0 +1,12 @@
+{
+  "name": "adopet",
+  "displayName": "adopet",
+  "expo": {
+    "name": "adopet",
+    "slug": "adopet",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
