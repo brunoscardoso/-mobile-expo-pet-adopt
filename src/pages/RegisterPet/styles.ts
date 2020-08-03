@@ -1,6 +1,6 @@
+import { StyleSheet, Platform } from 'react-native';
 import styled from 'styled-components/native';
 import RNPickerSelect from 'react-native-picker-select';
-import { Platform } from 'react-native';
 
 export const Container = styled.SafeAreaView``;
 
@@ -88,4 +88,18 @@ export const TextButton = styled.Text`
   font-weight: bold;
   padding-left: 10px;
   font-size: 17px;
+`;
+
+export const Input = styled.TextInput.attrs({
+  placeholderTextColor: 'rgba(255,255,255,0.1)',
+})`
+  width: 100%;
+  height: 40px;
+  padding: 0 15px;
+  background: #f0f0f5;
+  border-radius: 4px;
+  flex-direction: row;
+  align-items: center;
+  font-size: 15px;
+  color: #6c6c80;
 `;

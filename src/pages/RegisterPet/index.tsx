@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ImagePicker from 'react-native-image-crop-picker';
+import * as ImagePicker from 'expo-image-picker';
+import * as Permissions from 'expo-permissions';
+import Constants from 'expo-constants';
 import MapView from 'react-native-maps';
 
 import {
@@ -18,19 +20,19 @@ import {
   Dropdown,
   RegisterButton,
   TextButton,
+  Input,
 } from './styles';
 
 import uploadPreview from '../../assets/upload-image.png';
 
 import Header from '../../components/Header';
-import Input from '../../components/Input';
 
 import api from '../../services/api';
 
 interface FilePhoto {
   path: string;
   filename: string;
-  mime: string;
+  type: string;
 }
 
 interface IBGEUFResponse {
@@ -99,27 +101,7 @@ const RegisterPet: React.FC = () => {
     { label: 'Grande', value: 'Grande' },
   ]);
 
-  function handleName(value: string) {
-    setName(value);
-  }
-
-  function handleSizeDropdown(value: string) {
-    setSize(value);
-  }
-
-  function handleGenderDropdown(value: string) {
-    setGender(value);
-  }
-
-  function handleUfsDropdown(value: string) {
-    setSelectedUf(value);
-  }
-
-  function handleCitiesDropdown(value: string) {
-    setSelectedCity(value);
-  }
-
-  async function handleSubmit() {
+  async function handleSubmit(): Promise<void> {
     const uf = selectedUf;
     const city = selectedCity;
     const [latitude, longitude] = selectedPosition;
@@ -143,16 +125,27 @@ const RegisterPet: React.FC = () => {
     await api.post('pets', data);
   }
 
-  function handleChangePhoto() {
-    ImagePicker.openPicker({
-      width: 300,
-      height: 400,
-      cropping: true,
-    }).then(({ path, filename, mime }) => {
-      setFilename(filename);
-      setPath(path);
-      setType(mime);
+  async function handleChangePhoto(): Promise<void> {
+    if (Constants.platform.ios) {
+      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      if (status !== 'granted') {
+        alert('Sorry, we need camera roll permissions to make this work!');
+      }
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
+
+    if (!result.cancelled) {
+      setPath(result.uri);
+      setType(result.type);
+      const getFilename = result.uri.split(/\/(?=[^]+$)/).pop();
+      setFilename(getFilename);
+    }
   }
 
   return (
@@ -166,10 +159,7 @@ const RegisterPet: React.FC = () => {
               <Photo source={path ? { uri: path } : uploadPreview} />
             </PhotoButton>
             <Label>Nome (psiu, batisa ele ai)</Label>
-            <Input
-              onChangeText={(value: string) => handleName(value)}
-              value={name}
-            />
+            <Input onChangeText={(value) => setName(value)} value={name} />
             <GroupContainer>
               <DropDownContainerLeft>
                 <Label>Porte</Label>
@@ -179,7 +169,7 @@ const RegisterPet: React.FC = () => {
                       label: 'Selecione o tamanho',
                       value: null,
                     }}
-                    onValueChange={(value) => handleSizeDropdown(value)}
+                    onValueChange={(value) => setSize(value)}
                     items={sizes}
                   />
                 </DropDownStyled>
@@ -193,7 +183,7 @@ const RegisterPet: React.FC = () => {
                       label: 'Selecione o sexo',
                       value: null,
                     }}
-                    onValueChange={(value) => handleGenderDropdown(value)}
+                    onValueChange={(value) => setGender(value)}
                     items={genders}
                   />
                 </DropDownStyled>
@@ -209,7 +199,7 @@ const RegisterPet: React.FC = () => {
                       label: 'Selecione o UF',
                       value: null,
                     }}
-                    onValueChange={(value) => handleUfsDropdown(value)}
+                    onValueChange={(value) => setSelectedUf(value)}
                     items={ufs.map((sigla) => ({
                       key: sigla,
                       label: sigla,
@@ -227,7 +217,7 @@ const RegisterPet: React.FC = () => {
                       label: 'Selecione a cidade',
                       value: null,
                     }}
-                    onValueChange={(value) => handleCitiesDropdown(value)}
+                    onValueChange={(value) => setSelectedCity(value)}
                     items={cities.map((city) => ({
                       key: city,
                       label: city,
