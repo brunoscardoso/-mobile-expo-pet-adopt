@@ -3,7 +3,8 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import Constants from 'expo-constants';
-import MapView from 'react-native-maps';
+import Dog from '@expo/vector-icons/FontAwesome5';
+import * as Location from 'expo-location';
 
 import {
   Container,
@@ -56,6 +57,9 @@ const RegisterPet: React.FC = () => {
     0,
   ]);
 
+  const [latitude, setLatitude] = useState<number>();
+  const [longitude, setLongitude] = useState<number>();
+
   const [path, setPath] = useState<FilePhoto>();
   const [filename, setFilename] = useState<FilePhoto>();
   const [type, setType] = useState<FilePhoto>();
@@ -72,7 +76,6 @@ const RegisterPet: React.FC = () => {
         const ufInitials = response.data.map((uf) => uf.sigla);
         setUfs(ufInitials);
       });
-    setSelectedPosition([23.23232323, 49.923293293]);
   }, []);
 
   useEffect(() => {
@@ -90,6 +93,22 @@ const RegisterPet: React.FC = () => {
       });
   }, [selectedUf]);
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+      }
+
+      const location = await Location.getCurrentPositionAsync();
+
+      const { latitude: lat, longitude: long } = location.coords;
+
+      setLatitude(lat);
+      setLongitude(long);
+    })();
+  }, []);
+
   const [genders] = useState([
     { label: 'Macho', value: 'Macho' },
     { label: 'Fêmea', value: 'Fêmea' },
@@ -104,8 +123,6 @@ const RegisterPet: React.FC = () => {
   async function handleSubmit(): Promise<void> {
     const uf = selectedUf;
     const city = selectedCity;
-    const [latitude, longitude] = selectedPosition;
-
     const data = new FormData();
 
     data.append('name', name);
@@ -228,16 +245,8 @@ const RegisterPet: React.FC = () => {
               </DropDownContainerRight>
             </GroupContainer>
 
-            <MapView
-              initialRegion={{
-                latitude: 37.78825,
-                longitude: -122.4324,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-              }}
-            />
-
             <RegisterButton onPress={handleSubmit}>
+              <Dog name="dog" size={22} color="#fff" />
               <TextButton>Cadastrar</TextButton>
             </RegisterButton>
           </Card>

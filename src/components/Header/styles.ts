@@ -1,4 +1,4 @@
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 
 export const Container = styled.SafeAreaView`
   margin-top: 30px;
@@ -12,7 +12,7 @@ export const BackButton = styled.TouchableOpacity`
 `;
 
 export const Logo = styled.Image.attrs({
-  resizeMode: "stretch",
+  resizeMode: 'stretch',
 })`
   width: 142px;
   height: 36px;
