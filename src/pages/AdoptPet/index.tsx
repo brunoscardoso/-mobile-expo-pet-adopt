@@ -86,7 +86,6 @@ const AdoptPet: React.FC = () => {
     <TouchableOpacity
       onPress={() =>
         navigation.navigate('DetailsPet', {
-          id: item.id,
           item,
         })
       }
@@ -100,7 +99,12 @@ const AdoptPet: React.FC = () => {
   );
 
   const renderItem = ({ item }) => (
-    <Pet name={item.name} photo={item.photoUrl} gender={item.gender} />
+    <Pet
+      id={item.id}
+      name={item.name}
+      photo={item.photoUrl}
+      gender={item.gender}
+    />
   );
 
   return (
