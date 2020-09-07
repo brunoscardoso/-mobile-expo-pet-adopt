@@ -37,6 +37,8 @@ interface PetsArray {
   size: string;
   gender: string;
   photoUrl: string;
+  latitude: number;
+  longitude: number;
 }
 
 const AdoptPet: React.FC = () => {
@@ -98,12 +100,15 @@ const AdoptPet: React.FC = () => {
     </TouchableOpacity>
   );
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: PetsArray }) => (
     <Pet
       id={item.id}
       name={item.name}
       photo={item.photoUrl}
       gender={item.gender}
+      size={item.size}
+      latitude={item.latitude}
+      longitude={item.longitude}
     />
   );
 
